@@ -15,8 +15,7 @@ export class AuthService {
       throw new UnauthorizedException('Username already exists');
     }
 
-    // Create new user (in a real app, you'd hash the password)
-    const user: User = { username, password };
+    const user: User = { username, password }; // Create a new user object
     this.users.push(user);
     return user;
   }

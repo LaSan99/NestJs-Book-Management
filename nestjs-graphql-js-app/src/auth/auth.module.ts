@@ -10,7 +10,7 @@ import { AuthResolver } from './auth.resolver';
       signOptions: { expiresIn: '1h' },
     }),
   ],
-  providers: [AuthService, AuthResolver],
-  exports: [AuthService],
+  providers: [AuthService, AuthResolver], // Providers are the classes that can be injected into other classes
+  exports: [AuthService], // What parts of this module are shared with others
 })
 export class AuthModule {} 

@@ -40,7 +40,7 @@ const client = new ApolloClient({
       fetchPolicy: 'network-only', // Ensures that queries always fetch fresh data from the server
     },
     query: {
-      fetchPolicy: 'network-only', // Ensures that queries always fetch fresh data from the server
+      fetchPolicy: 'network-only', 
     },
   },
 });

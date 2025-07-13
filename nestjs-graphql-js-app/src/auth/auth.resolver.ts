@@ -4,7 +4,7 @@ import { User } from './user.entity';
 
 @Resolver() //Marks this class as a GraphQL resolver.
 export class AuthResolver {
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService) {} //Injects the AuthService into this resolver.
 
   @Mutation(() => User)
   async register(
