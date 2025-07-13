@@ -23,7 +23,8 @@ import {
   IconButton,
   Tooltip,
   Fade,
-  Zoom
+  Zoom,
+  Snackbar
 } from '@mui/material';
 import {
   ArrowBack,
@@ -42,6 +43,7 @@ export default function BookDetail() {
   const params = useParams();
   const id = parseInt(params.id);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
   const { data, loading, error } = useQuery(GET_BOOK_BY_ID, {
     variables: { id },
@@ -53,7 +55,8 @@ export default function BookDetail() {
       router.push('/books');
     },
     onError: (error) => {
-      console.error('Error deleting book:', error);
+      setErrorMessage(error.message);
+      setIsDeleteDialogOpen(false);
     }
   });
 
@@ -63,8 +66,13 @@ export default function BookDetail() {
         variables: { id }
       });
     } catch (err) {
-      // Error is handled by onError callback
+      setErrorMessage(err.message);
+      setIsDeleteDialogOpen(false);
     }
+  };
+
+  const handleCloseError = () => {
+    setErrorMessage('');
   };
 
   if (loading) {
@@ -433,6 +441,23 @@ export default function BookDetail() {
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* Error Snackbar */}
+      <Snackbar
+        open={!!errorMessage}
+        autoHideDuration={6000}
+        onClose={handleCloseError}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert 
+          onClose={handleCloseError} 
+          severity="error" 
+          variant="filled"
+          sx={{ width: '100%', borderRadius: 2 }}
+        >
+          {errorMessage}
+        </Alert>
+      </Snackbar>
     </Layout>
   );
 }

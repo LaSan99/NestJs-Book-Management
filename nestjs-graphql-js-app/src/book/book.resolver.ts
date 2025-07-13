@@ -1,4 +1,4 @@
-import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
+import { Resolver, Query, Mutation, Args, Int, Context } from '@nestjs/graphql';
 import { UseGuards } from '@nestjs/common';
 import { BookService } from './book.service';
 import { Book } from './book.entity';
@@ -14,20 +14,29 @@ export class BookResolver {
   // Protected routes - require authentication
   @UseGuards(AuthGuard)
   @Mutation(() => Book)
-  createBook(@Args('createBookInput') createBookInput: CreateBookInput) {
-    return this.bookService.create(createBookInput);
+  createBook(
+    @Args('createBookInput') createBookInput: CreateBookInput,
+    @Context() context
+  ) {
+    return this.bookService.create(createBookInput, context.req.user.username);
   }
 
   @UseGuards(AuthGuard)
   @Mutation(() => Book)
-  updateBook(@Args('updateBookInput') updateBookInput: UpdateBookInput) {
-    return this.bookService.update(updateBookInput);
+  updateBook(
+    @Args('updateBookInput') updateBookInput: UpdateBookInput,
+    @Context() context
+  ) {
+    return this.bookService.update(updateBookInput, context.req.user.username);
   }
 
   @UseGuards(AuthGuard)
   @Mutation(() => Boolean)
-  removeBook(@Args('id', { type: () => Int }) id: number) {  // Use Int type for ID Maps that value to the id: number parameter in TypeScript
-    return this.bookService.remove(id);
+  removeBook(
+    @Args('id', { type: () => Int }) id: number,
+    @Context() context // Access the request context to get user information
+  ) {
+    return this.bookService.remove(id, context.req.user.username);
   }
 
   // Public routes - no authentication needed

@@ -8,6 +8,7 @@ type Book {
   author: String!
   publishedYear: Int!
   genre: String!
+  createdBy: String!
 }
 
 type User {

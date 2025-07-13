@@ -6,12 +6,11 @@ import { AuthService } from './auth.service';
 export class AuthGuard implements CanActivate {
   constructor(private authService: AuthService) {}
 
-  canActivate(context: ExecutionContext): boolean {  //This method runs automatically to decide if the request passes or not
-    const ctx = GqlExecutionContext.create(context); // Converts the execution context to a GraphQL context
-    const req = ctx.getContext().req; // Get the request object from the context
+  canActivate(context: ExecutionContext): boolean {
+    const ctx = GqlExecutionContext.create(context);
+    const req = ctx.getContext().req;
 
-    // Get token from header
-    const token = req.headers.authorization?.replace('Bearer ', ''); //Removes the 'Bearer ' prefix to get the token only.
+    const token = req.headers.authorization?.replace('Bearer ', '');
     if (!token) {
       throw new UnauthorizedException('Please login first');
     }
@@ -21,6 +20,9 @@ export class AuthGuard implements CanActivate {
     if (!user) {
       throw new UnauthorizedException('Invalid token');
     }
+
+    // Add user to request object
+    req.user = user;
 
     return true;
   }

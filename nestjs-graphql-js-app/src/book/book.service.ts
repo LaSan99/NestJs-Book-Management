@@ -1,18 +1,19 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { CreateBookInput } from './dto/create-book.input';
 import { UpdateBookInput } from './dto/update-book.input';
 import { SearchBooksInput } from './dto/search-books.input';
 import { Book } from './book.entity';
 
-@Injectable() //Makes this service usable in other parts of your app
+@Injectable()
 export class BookService {
   private books: Book[] = [];
   private idCounter = 1;
 
-  create(createBookInput: CreateBookInput): Book {
+  create(createBookInput: CreateBookInput, username: string): Book {
     const newBook = {
       id: this.idCounter++,
-      ...createBookInput, // Spread operator to copy properties from createBookInput
+      ...createBookInput,
+      createdBy: username,
     };
     this.books.push(newBook);
     return newBook;
@@ -30,20 +31,32 @@ export class BookService {
     return book;
   }
 
-  update(updateBookInput: UpdateBookInput): Book {
+  update(updateBookInput: UpdateBookInput, username: string): Book {
     const book = this.findOne(updateBookInput.id);
     if (!book) {
       throw new NotFoundException(`Book with ID ${updateBookInput.id} not found`);
     }
-    Object.assign(book, updateBookInput); //copies all fields from updateBookInput into the found book.
+    
+    // Check if the user is the creator of the book
+    if (book.createdBy !== username) {
+      throw new UnauthorizedException('You can only update your own books');
+    }
+
+    Object.assign(book, updateBookInput);
     return book;
   }
 
-  remove(id: number): boolean {
+  remove(id: number, username: string): boolean {
     const index = this.books.findIndex(book => book.id === id);
     if (index === -1) {
       throw new NotFoundException(`Book with ID ${id} not found`);
     }
+
+    // Check if the user is the creator of the book
+    if (this.books[index].createdBy !== username) {
+      throw new UnauthorizedException('You can only delete your own books');
+    }
+
     this.books.splice(index, 1);
     return true;
   }
